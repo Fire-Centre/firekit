@@ -1,6 +1,6 @@
 Package: firekit
 Title: General purpose toolkit for the Fire Centre.
-Version: 0.0.0.9000
+Version: 0.0.1.0000
 Authors@R: 
     person(given = "Todd",
            family = "Ellis",
@@ -12,7 +12,7 @@ License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Imports:
   cowplot,
   DBI,
