@@ -5,12 +5,13 @@
 \title{theme_fire}
 \usage{
 theme_fire(
-  axis.title = 10,
-  axis.text = 7.5,
-  strip.text = 7,
-  legend.text = 9.25,
-  line_col = "#9B9D9C",
-  strip.background = "white"
+  axis.title = 14,
+  axis.text = 10,
+  strip.text = 10.5,
+  legend.text = 10.25,
+  strip.bg = "white",
+  plot.bg = "white",
+  line.col = "#838383"
 )
 }
 \arguments{

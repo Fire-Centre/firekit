@@ -91,6 +91,3 @@ pkgs <- function(packages,
   }
 }
 
-#' @rdname pkgs
-#' @export
-package_check <- pkgs

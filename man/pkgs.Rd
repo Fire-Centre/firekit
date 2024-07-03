@@ -2,16 +2,9 @@
 % Please edit documentation in R/pkgs.R
 \name{pkgs}
 \alias{pkgs}
-\alias{package_check}
 \title{pkgs}
 \usage{
 pkgs(packages, quiet = FALSE, repos = c("https://cloud.r-project.org"))
-
-package_check(
-  packages,
-  quiet = FALSE,
-  repos = c("https://cloud.r-project.org")
-)
 }
 \arguments{
 \item{packages}{Single character or character vector with package/library names}
