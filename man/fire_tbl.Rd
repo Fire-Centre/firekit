@@ -4,12 +4,22 @@
 \alias{fire_tbl}
 \title{fire_tbl}
 \usage{
-fire_tbl(query = NULL, db = "FIRE_CENTRE_DB", ...)
+fire_tbl(
+  query = NULL,
+  db = "FIRE_CENTRE_DB",
+  writable = FALSE,
+  proj_str = FALSE,
+  ...
+)
 }
 \arguments{
 \item{query}{SQL SELECT query or SCHEMA.TABLE EDW reference.}
 
-\item{con}{Database connection object.}
+\item{db}{Database name or path/to/database/object.}
+
+\item{writable}{Logical re: making the connection writeable. Warning: Only one individual can be connected to a database with a writable connection at a time.}
+
+\item{proj_str}{Logical re: if the firekit::fire_project folder structure is used for the location of the database. Temporary measure until databsae storage is (potentially) standardised.}
 }
 \value{
 Lazy connection or local database dataframe.

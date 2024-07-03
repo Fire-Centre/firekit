@@ -3,7 +3,9 @@
 #' Connect to a specified database/table.
 #'
 #' @param query SQL SELECT query or SCHEMA.TABLE EDW reference.
-#' @param con Database connection object.
+#' @param db Database name or path/to/database/object.
+#' @param writable Logical re: making the connection writeable. Warning: Only one individual can be connected to a database with a writable connection at a time.
+#' @param proj_str Logical re: if the firekit::fire_project folder structure is used for the location of the database. Temporary measure until databsae storage is (potentially) standardised.
 #'
 #' @return Lazy connection or local database dataframe.
 #' @export
@@ -17,6 +19,8 @@
 
 fire_tbl <- function(query = NULL,
                      db = "FIRE_CENTRE_DB",
+                     writable = FALSE,
+                     proj_str = FALSE,
                      ...) {
 
   ## CHECK IF A CONNECTION OBJECT NAMED `CON` EXISTS IN THE GLOBAL ENVIRONMENT...
@@ -25,9 +29,23 @@ fire_tbl <- function(query = NULL,
                 envir = .GlobalEnv)
     } else {
       ## ...OR CREATE THE DATABASE CONNECTION AND SAVE IT TO THE GLOBAL ENVIRONMENT
+
+      if (proj_str) {
+        .db <-
+          here::here(glue::glue("01 Analysis/DB/{db}"))
+      } else {
+        .db <-
+          db
+      }
+
+      if (!stringr::str_detect(.db, ".duckdb")) {
+        .db <-
+          glue::glue("{.db}.duckdb")
+      }
+
       .con <-
-        here::here(glue::glue("01 Analysis/DB/{db}.duckdb")) |>
-        duckdb::duckdb(read_only = TRUE) |>
+        .db |>
+        duckdb::duckdb(read_only = !writable) |>
         DBI::dbConnect()
 
       con <<-
