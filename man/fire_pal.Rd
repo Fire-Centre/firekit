@@ -17,3 +17,9 @@ Vector of color hex codes using shades of UTAS-themed colours.
 \description{
 Create custom-length vector of color hex codes that fall within one of the many Fire Centre-themed colour palettes.
 }
+\examples{
+\dontrun{
+  fire_pal(n = 5, pal = "fire")
+}
+
+}

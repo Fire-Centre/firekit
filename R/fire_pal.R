@@ -9,6 +9,9 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#'   fire_pal(n = 5, pal = "fire")
+#' }
 #'
 
 fire_pal <- function(n = 5,
