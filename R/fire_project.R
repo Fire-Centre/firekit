@@ -11,33 +11,47 @@
 
 fire_project <- function(quiet = FALSE,
                          dir = c("db", "od"),
+                         drive = NULL,
                          number = TRUE) {
 
   ## TODO: Add a custom directory setting or here::here reference.
   dir <-
     rlang::arg_match(dir)
 
-  if (!dir %in% c("db", "od", "here")) {
-    stop("Choose a working directory (dir = ...) as either Dropbox ('db') or OneDrive ('od') or the local directory ('here').")
+  if (!dir %in% c("db", "od")) {
+    stop("Choose a working directory (dir = ...) as either Dropbox ('db') or OneDrive ('od').")
   }
-
-  .uid <-
-    Sys.getenv("USERNAME")
 
   if (dir == 'od') {
 
     .dir <-
-      glue::glue("C:/Users/{.uid}/University of Tasmania/Biological Sciences-Fire Centre - Documents/")
+      glue::glue("{Sys.getenv('OneDrive')}/Biological Sciences-Fire Centre - Documents/")
 
   } else if (dir == 'db') {
 
+    if (is.null(drive)) {
+      .drive <-
+        "C:/Users/{Sys.getenv('USERNAME')}"
+    } else {
+      .drive <-
+        drive
+      if (nchar(.drive) == 1) {
+        .drive <-
+          glue::glue("{.drive}:")
+      }
+    }
+
     .dir <-
-      fs::dir_info(glue::glue("C:/Users/{.uid}/UTAS Research Dropbox/")) |>
-      dplyr::filter(type == "directory") |>
-      dplyr::arrange(desc(modification_time)) |>
-      dplyr::slice(1) |>
-      dplyr::pull(path) |>
-      glue::glue(x = "{_}", "/Fire Centre/")
+      fs::dir_info(glue::glue("{.drive}/UTAS Research Dropbox/"),
+                   type = "directory",
+                   recurse = TRUE) |>
+      dplyr::filter(stringr::str_detect(path,
+                                        "/Fire Centre$")) |>
+      dplyr::pull(path)
+
+    if (length(.dir) == 0) {
+      stop(glue::glue("Provided Dropbox directory not found: {.drive}/UTAS Research Dropbox/"))
+    }
 
   }
 
@@ -168,11 +182,16 @@ fire_project <- function(quiet = FALSE,
     suppressWarnings(dir.create(glue::glue("{.dir_00}Literature/")))
     suppressWarnings(dir.create(.dir_01))
     suppressWarnings(dir.create(glue::glue("{.dir_01}Data/")))
-    suppressWarnings(dir.create(glue::glue("{.dir_01}DB/")))
+    suppressWarnings(dir.create(glue::glue("{.dir_01}Data/DB/")))
+    suppressWarnings(dir.create(glue::glue("{.dir_01}Data/Scratch/")))
     suppressWarnings(dir.create(glue::glue("{.dir_01}Scratch/")))
     suppressWarnings(dir.create(.dir_02))
     suppressWarnings(dir.create(glue::glue("{.dir_02}Figures/")))
+    suppressWarnings(dir.create(glue::glue("{.dir_02}Figures/Scratch/")))
+    suppressWarnings(dir.create(glue::glue("{.dir_02}Models/")))
+    suppressWarnings(dir.create(glue::glue("{.dir_02}Models/Scratch/")))
     suppressWarnings(dir.create(glue::glue("{.dir_02}Tables/")))
+    suppressWarnings(dir.create(glue::glue("{.dir_02}Tables/Scratch/")))
     suppressWarnings(dir.create(.dir_03))
 
     usethis::create_project(path = .dir_project,
