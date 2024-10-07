@@ -10,7 +10,7 @@
 #'}
 
 fire_project <- function(quiet = FALSE,
-                         dir = c("db", "od"),
+                         dir = c("dropbox", "onedrive", "custom"),
                          drive = NULL,
                          number = TRUE) {
 
@@ -18,16 +18,16 @@ fire_project <- function(quiet = FALSE,
   dir <-
     rlang::arg_match(dir)
 
-  if (!dir %in% c("db", "od")) {
-    stop("Choose a working directory (dir = ...) as either Dropbox ('db') or OneDrive ('od').")
+  if (!dir %in% c("dropbox", "onedrive", "custom")) {
+    stop("Choose a working directory (dir = ...) as either Dropbox ('dropbox'), OneDrive ('onedrive'), or 'custom'.")
   }
 
-  if (dir == 'od') {
+  if (dir == 'onedrive') {
 
     .dir <-
       glue::glue("{Sys.getenv('OneDrive')}/Biological Sciences-Fire Centre - Documents/")
 
-  } else if (dir == 'db') {
+  } else if (dir == 'dropbox') {
 
     if (is.null(drive)) {
       .drive <-
@@ -53,20 +53,34 @@ fire_project <- function(quiet = FALSE,
       stop(glue::glue("Provided Dropbox directory not found: {.drive}/UTAS Research Dropbox/"))
     }
 
+  } else if (dir == "custom") {
+
+    if (is.null(drive)) {
+      stop("Provide a preferred projects address (e.g., 'C:/Projects/').")
+    } else {
+      .dir <-
+        drive
+    }
+
+
   }
 
   .date <-
     stringr::str_remove_all(substr(Sys.Date(), 1, 7), "-")
 
-  .ls_projects <- c(
-    "Ad hocs",
-    "Projects"#,
-    # "Sandbox"
+  if (dir %in% c("dropbox", "onedrive")) {
+    .ls_projects <- c(
+      "Ad hocs",
+      "Projects"#,
+      # "Sandbox"
     )
-
-  .subfolder <-
-    .ls_projects[utils::menu(title = "Choose a directory to work from:",
-                 .ls_projects)]
+    .subfolder <-
+      .ls_projects[utils::menu(title = "Choose a directory to work from:",
+                               .ls_projects)]
+  } else {
+    .subfolder <-
+      ""
+  }
 
   .dir_subfolder <- paste0(.dir,
                            .subfolder,
@@ -206,7 +220,10 @@ fire_project <- function(quiet = FALSE,
 # Project               : {.name_project_raw}
 # Date                  : {Sys.Date()}
 # Requested by          : {ifelse(.name_stakeholder_raw == 'First Last', 'N/A', .name_stakeholder_raw)}
-# TODOs                 : ...
+# Summary               : ...
+#                       : ...
+# TODOs                 : 1. ...
+#                       : &. ...
 ################################################################################
 firekit::pkgs(c('tidyverse', 'fire-centre/firekit'))"),
                glue::glue("{.dir_01}00_Setup.R"))
