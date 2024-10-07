@@ -33,4 +33,6 @@ Connect to a specified database/table.
 
 }
 
+TODO: Need to clarify db locations and type (e.g., likely shift to PostgreSQL for its type of data transfer).
+
 }

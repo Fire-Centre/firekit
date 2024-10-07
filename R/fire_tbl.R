@@ -16,7 +16,8 @@
 #'
 #' }
 #'
-
+#' TODO: Need to clarify db locations and type (e.g., likely shift to PostgreSQL for its type of data transfer).
+#'
 fire_tbl <- function(query = NULL,
                      db = "FIRE_CENTRE_DB",
                      writable = FALSE,
@@ -32,7 +33,7 @@ fire_tbl <- function(query = NULL,
 
       if (proj_str) {
         .db <-
-          here::here(glue::glue("01 Analysis/DB/{db}"))
+          here::here(glue::glue("01 Analysis/Data/DB/{db}"))
       } else {
         .db <-
           db
