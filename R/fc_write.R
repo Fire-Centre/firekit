@@ -59,10 +59,24 @@ fc_write <- function(x,
 
   }
 
-  DBI::dbWriteTableArrow(.con,
-                         DBI::Id(schema = .schema,
-                                 table = .table),
-                         x,
-                         append = FALSE)
+  tryCatch({
+
+    DBI::dbCreateTableArrow(.con,
+                           DBI::Id(schema = .schema,
+                                   table = .table),
+                           nanoarrow::infer_nanoarrow_schema(x))
+
+  },
+  error = function(cond) {
+
+    DBI::dbWriteTableArrow(.con,
+                           DBI::Id(schema = .schema,
+                                   table = .table),
+                           x,
+                           append = FALSE)
+
+  })
+
+
 
 }
