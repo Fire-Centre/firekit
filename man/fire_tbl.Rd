@@ -6,9 +6,10 @@
 \usage{
 fire_tbl(
   query = NULL,
-  db = "FIRE_CENTRE_DB",
+  db = "firecentre",
+  reset = FALSE,
   writable = FALSE,
-  proj_str = FALSE,
+  kid = 1,
   ...
 )
 }
@@ -17,9 +18,11 @@ fire_tbl(
 
 \item{db}{Database name or path/to/database/object.}
 
+\item{reset}{Logical Denotes whether to reset the connection object (\code{con}). Useful if needing to turn writable on/off or change databases.}
+
 \item{writable}{Logical re: making the connection writeable. Warning: Only one individual can be connected to a database with a writable connection at a time.}
 
-\item{proj_str}{Logical re: if the firekit::fire_project folder structure is used for the location of the database. Temporary measure until databsae storage is (potentially) standardised.}
+\item{kid}{int : User ID number for accessing a list of stored credentials via \code{keyring}. Should typically be 1 unless multiple credentials are stored on one system.}
 }
 \value{
 Lazy connection or local database dataframe.
@@ -32,7 +35,5 @@ Connect to a specified database/table.
 
 
 }
-
-TODO: Need to clarify db locations and type (e.g., likely shift to PostgreSQL for its type of data transfer).
 
 }

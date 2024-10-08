@@ -4,8 +4,9 @@
 #'
 #' @param query SQL SELECT query or SCHEMA.TABLE EDW reference.
 #' @param db Database name or path/to/database/object.
+#' @param reset Logical Denotes whether to reset the connection object (`con`). Useful if needing to turn writable on/off or change databases.
 #' @param writable Logical re: making the connection writeable. Warning: Only one individual can be connected to a database with a writable connection at a time.
-#' @param proj_str Logical re: if the firekit::fire_project folder structure is used for the location of the database. Temporary measure until databsae storage is (potentially) standardised.
+#' @param kid int : User ID number for accessing a list of stored credentials via `keyring`. Should typically be 1 unless multiple credentials are stored on one system.
 #'
 #' @return Lazy connection or local database dataframe.
 #' @export
@@ -16,38 +17,113 @@
 #'
 #' }
 #'
-#' TODO: Need to clarify db locations and type (e.g., likely shift to PostgreSQL for its type of data transfer).
-#'
 fire_tbl <- function(query = NULL,
-                     db = "FIRE_CENTRE_DB",
+                     db = "firecentre",
+                     reset = FALSE,
                      writable = FALSE,
-                     proj_str = FALSE,
+                     kid = 1,
                      ...) {
 
+  if ("con" %in% ls(envir = .GlobalEnv) &
+      reset) {
+    DBI::dbDisconnect(con)
+  }
+
   ## CHECK IF A CONNECTION OBJECT NAMED `CON` EXISTS IN THE GLOBAL ENVIRONMENT...
-  if ("con" %in% ls(envir = .GlobalEnv)) {
+  if ("con" %in% ls(envir = .GlobalEnv) &
+      !reset) {
+
     .con <- get("con",
                 envir = .GlobalEnv)
+
     } else {
-      ## ...OR CREATE THE DATABASE CONNECTION AND SAVE IT TO THE GLOBAL ENVIRONMENT
 
-      if (proj_str) {
-        .db <-
-          here::here(glue::glue("01 Analysis/Data/DB/{db}"))
+      ## Potential to add multiple databases as options.
+      if (db %in% c("firecentre")) {
+
+        if (db == "firecentre") {
+
+          if (is.na(keyring::key_list(db)[kid,2])) {
+            setup_flag = TRUE
+          } else {
+            setup_flag = FALSE
+          }
+
+          .uid = tryCatch(
+            ## Check to see if username exists for the specified server name
+            ## TODO: Clean this up -- it seems overly complicated(?)...
+            ifelse(setup_flag,
+                   warning(),
+                   keyring::key_list(db)[kid,2]),
+            warning = function(cond) {
+              .uid = rstudioapi::askForPassword('Username')
+              keyring::key_set(service = db,
+                               username = .uid)
+              return(.uid)
+            },
+            error = function(cond) {
+              .uid = rstudioapi::askForPassword('Username')
+              keyring::key_set(service = db,
+                               username = .uid)
+              return(.uid)
+            }
+          )
+
+          .con <-
+            DBI::dbConnect(RPostgres::Postgres(),
+                           dbname = db,
+                           host = "131.217.175.166",
+                           user = .uid,
+                           password = keyring::key_get(db, .uid))
+
+          if (setup_flag) {
+
+            .setup <-
+              rstudioapi::askForPassword('Would you like to set up personal schema?')
+
+            while (!.setup %in% c('y', 'n', 'yes', 'no')) {
+
+              .setup <-
+                rstudioapi::askForPassword("Would you like to set up personal schema? Please specify 'y', 'yes', 'n', 'no'.")
+
+            }
+
+            if (.setup %in% c('y', 'yes')) {
+
+              DBI::dbGetQuery(.con,
+                              glue::glue("CREATE SCHEMA AUTHORIZATION {.uid};"))
+              DBI::dbGetQuery(.con,
+                              glue::glue("ALTER USER '{.uid}' SET SEARCH_PATH = '{.uid}';"))
+              DBI::dbGetQuery(.con,
+                              glue::glue("SET SEARCH_PATH TO {.uid};"))
+
+            }
+
+          }
+
+        } else {
+
+          stop("Please provide a pre-set database connection (currently only: `firecentre`) or the direct path to a database object.")
+
+        }
+
       } else {
-        .db <-
-          db
-      }
 
-      if (!stringr::str_detect(.db, ".duckdb")) {
-        .db <-
-          glue::glue("{.db}.duckdb")
-      }
+        ## TODO: Need to allow for multiple database types here. Perhaps using `odbc()`?
+        if (stringr::str_detect(db, ".duckdb")) {
 
-      .con <-
-        .db |>
-        duckdb::duckdb(read_only = !writable) |>
-        DBI::dbConnect()
+          .con <-
+            db |>
+            duckdb::duckdb(read_only = !writable) |>
+            DBI::dbConnect()
+
+        } else {
+
+          stop("Currently only custom {duckdb} databases are supported. Contact todd.ellis@utas.edu.au to addres.")
+
+        }
+
+      }
 
       con <<-
         .con
@@ -63,31 +139,43 @@ fire_tbl <- function(query = NULL,
     } else {
 
       ## CHECK IF REQUESTED TABLE IS A SQL QUERY AND RUN IT!
-      if (startsWith(tolower(stringr::str_trim(query)), "select ") |
-          startsWith(tolower(stringr::str_trim(query)), "with ") |
-          startsWith(tolower(stringr::str_trim(query)), "show ")) {
+      if (stringr::str_starts(tolower(stringr::str_trim(query)), "(alter|create|select|set|show|with) ")) {
 
         .query_flag <- TRUE
-        .output <- tryCatch({
-          DBI::dbGetQuery(.con,
-                          query) |>
-            janitor::clean_names(case = "all_caps")
-        },
-        warning = function(cond) {
-          DBI::dbGetQuery(.con,
-                          query |>
-                            readr::read_lines() |>
-                            paste(collapse = "\n")) |>
-            janitor::clean_names(case = "all_caps")
-        },
-        error = function(cond) {
-          DBI::dbGetQuery(.con,
-                          query |>
-                            readr::read_lines() |>
-                            paste(collapse = "\n")) |>
-            janitor::clean_names(case = "all_caps")
-        })
 
+        ## Check for unique PostgreSQL syntax for SHOW ALL TABLES;
+        ## N.B. This is a hack-y workaround!
+        if (startsWith(tolower(stringr::str_trim(query)), "show all tables") &
+            class(.con)[1] == "PqConnection") {
+
+          .output <-
+            DBI::dbGetQuery(.con,
+                            "SELECT *
+                            FROM pg_catalog.pg_tables
+                            WHERE schemaname != 'pg_catalog' AND
+                            schemaname != 'information_schema';")
+
+
+        } else {
+
+          .output <- tryCatch({
+            DBI::dbGetQuery(.con,
+                            query)
+          },
+          warning = function(cond) {
+            DBI::dbGetQuery(.con,
+                            query |>
+                              readr::read_lines() |>
+                              paste(collapse = "\n"))
+          },
+          error = function(cond) {
+            DBI::dbGetQuery(.con,
+                            query |>
+                              readr::read_lines() |>
+                              paste(collapse = "\n"))
+          })
+
+        }
 
         if (startsWith(tolower(stringr::str_trim(query)), "show ")) {
           .output <-
@@ -96,64 +184,28 @@ fire_tbl <- function(query = NULL,
 
       } else {
 
-        ## TRANSFORM INPUT TABLE INFORMATION TO UPPERCASE
-        .query <-
-          toupper(query)
+        ## Upper- or lower-case table information.
+        if (class(.con) == "PqConnection") {
+          .query <-
+            tolower(query)
+        } else {
+          .query <-
+            toupper(query)
+        }
 
-        #### CHECK IF TABLE FORMAT INCLUDES EXTERNAL SCHEMA
-        if (stringr::str_count(.query, '[.]') == 1) {
-          #### PARSE SCHEMA.TABLE NAMES
-          .schema <-
-            stringr::str_split(.query, pattern = '[.]')[[1]][1]
-          .table <-
-            stringr::str_split(.query, pattern = '[.]')[[1]][2]
-
-          #### CONNECT TO TABLE
           tryCatch({
             .output <- dplyr::tbl(.con,
-                                  DBI::Id(schema = .schema,
-                                          table = .table)) |>
-              janitor::clean_names(case = "all_caps")
+                                  I(.query))
           },
           warning = function(cond) {},
           error = function(cond) {
             stop(paste0("ERROR             : Denied access to `", .query, "`. Check spelling or contact an administrator for access."))
           })
 
-          #### CONNECT TO USER-SPECIFIC TABLE IF NO SCHEMA EXISTS
-        } else {
-
-          .query <-
-            paste0("main.",
-                   .query)
-
-          tryCatch({
-            .output <- dplyr::tbl(.con,
-                                  .query) |>
-              janitor::clean_names(case = "all_caps")
-          },
-          warning = function(cond) {},
-          error = function(cond) {
-            stop(paste0("ERROR             : ", .query, " doesn't exist in personal schema. Check spelling or ensure correct schema is included."))
-          })
-
-        }
       }
 
     }
 
-    # ## The "MAIN.ORIGIN" object is the one outlier where the geometry column is named something else. Sigh.
-    # if ("geometry" %in% (tolower(colnames(.output)))) {
-    #   .output <-
-    #     dplyr::rename(.output,
-    #                   shape = geometry)
-    # }
-    #
-    # .output <-
-    #   dplyr::select(.output,
-    #                 !tidyselect::matches("geom"))
-
-    #### RETURN TABLE
     return(.output)
 
   }

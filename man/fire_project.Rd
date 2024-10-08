@@ -4,7 +4,12 @@
 \alias{fire_project}
 \title{fire_project}
 \usage{
-fire_project(quiet = FALSE, dir = c("db", "od"), drive = NULL, number = TRUE)
+fire_project(
+  quiet = FALSE,
+  dir = c("dropbox", "onedrive", "custom"),
+  drive = NULL,
+  number = TRUE
+)
 }
 \description{
 Creates common folder structure for new projects for consistency.
