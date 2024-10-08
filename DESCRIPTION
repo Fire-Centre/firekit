@@ -1,6 +1,6 @@
 Package: firekit
 Title: General purpose toolkit for the Fire Centre.
-Version: 0.0.2.0000
+Version: 0.0.2.1000
 Authors@R: 
     person(given = "Todd",
            family = "Ellis",

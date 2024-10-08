@@ -139,7 +139,7 @@ fire_tbl <- function(query = NULL,
     } else {
 
       ## CHECK IF REQUESTED TABLE IS A SQL QUERY AND RUN IT!
-      if (stringr::str_starts(tolower(stringr::str_trim(query)), "(alter|create|select|set|show|with) ")) {
+      if (stringr::str_starts(tolower(stringr::str_trim(query)), "(alter|create|drop|select|set|show|with) ")) {
 
         .query_flag <- TRUE
 
