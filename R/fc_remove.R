@@ -1,6 +1,6 @@
 #' fc_remove
 #'
-#' Removes an existing database object from the `firecentre` PostgreSQL database. Separate from write and append options to ensure their use is explicit at all times.
+#' Removes an existing database object from the `firecentre` PostgreSQL database.
 #'
 #' @param tbl Database schema and table name: Must be in `schema.table` syntax.
 #' @param db Database name or path/to/database/object.

@@ -15,7 +15,7 @@ fc_remove(tbl, db = "firecentre")
 Data exported to database.
 }
 \description{
-Removes an existing database object from the \code{firecentre} PostgreSQL database. Separate from write and append options to ensure their use is explicit at all times.
+Removes an existing database object from the \code{firecentre} PostgreSQL database.
 }
 \examples{
 \dontrun{

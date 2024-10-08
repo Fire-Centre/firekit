@@ -22,7 +22,7 @@ fc_index(
 Data exported to database.
 }
 \description{
-Manage indices in the \code{firecentre} PostgreSQL database.
+Manage indices in the \code{firecentre} PostgreSQL database. N.B. May be better to manage these from withing pgAdmin.
 }
 \examples{
 \dontrun{

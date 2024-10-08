@@ -1,6 +1,6 @@
 #' fc_write
 #'
-#' Write to the firecentre PostgreSQL database. Creates a new table or overwrites an existing one. Separate from append and remove options to ensure their use is explicit at all times.
+#' Write to the firecentre PostgreSQL database. Creates a new table or either overwrites or appends to an existing table.
 #'
 #' @param x Dataset to push to database.
 #' @param tbl Database schema and table name: Must be in `schema.table` syntax.
@@ -18,7 +18,8 @@
 
 fc_write <- function(x,
                      tbl,
-                     db = "firecentre") {
+                     db = "firecentre",
+                     overwrite = FALSE) {
 
   .tbl <-
     tbl
@@ -59,24 +60,35 @@ fc_write <- function(x,
 
   }
 
-  tryCatch({
+  if (overwrite) {
 
-    DBI::dbCreateTableArrow(.con,
-                           DBI::Id(schema = .schema,
-                                   table = .table),
-                           nanoarrow::infer_nanoarrow_schema(x))
+    tryCatch({
 
-  },
-  error = function(cond) {
+      DBI::dbCreateTableArrow(.con,
+                              DBI::Id(schema = .schema,
+                                      table = .table),
+                              nanoarrow::infer_nanoarrow_schema(x))
 
-    DBI::dbWriteTableArrow(.con,
-                           DBI::Id(schema = .schema,
-                                   table = .table),
-                           x,
-                           append = FALSE)
+    },
+    error = function(cond) {
 
-  })
+      DBI::dbRemoveTable(.con,
+                         DBI::Id(schema = .schema,
+                                 table = .table))
 
+      DBI::dbCreateTableArrow(.con,
+                              DBI::Id(schema = .schema,
+                                      table = .table),
+                              nanoarrow::infer_nanoarrow_schema(x))
+    })
+
+  }
+
+  DBI::dbWriteTableArrow(.con,
+                         DBI::Id(schema = .schema,
+                                 table = .table),
+                         x,
+                         append = TRUE)
 
 
 }

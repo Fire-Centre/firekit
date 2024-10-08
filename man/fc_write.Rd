@@ -4,7 +4,7 @@
 \alias{fc_write}
 \title{fc_write}
 \usage{
-fc_write(x, tbl, db = "firecentre")
+fc_write(x, tbl, db = "firecentre", overwrite = FALSE)
 }
 \arguments{
 \item{x}{Dataset to push to database.}
@@ -17,7 +17,7 @@ fc_write(x, tbl, db = "firecentre")
 Data exported to database.
 }
 \description{
-Write to the firecentre PostgreSQL database. Creates a new table or overwrites an existing one. Separate from append and remove options to ensure their use is explicit at all times.
+Write to the firecentre PostgreSQL database. Creates a new table or either overwrites or appends to an existing table.
 }
 \examples{
 \dontrun{
