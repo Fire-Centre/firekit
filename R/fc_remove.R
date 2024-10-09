@@ -43,7 +43,7 @@ fc_remove <- function(tbl,
         DBI::dbConnect(RPostgres::Postgres(),
                        dbname = db,
                        host = "131.217.175.166",
-                       user = .uid,
+                       user = keyring::key_list(service = "firecentre")[1,2],
                        password = keyring::key_get(db, keyring::key_list(service = "firecentre")[1,2]))
 
     } else {

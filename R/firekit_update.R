@@ -1,4 +1,4 @@
-#' fc_update
+#' firekit_update
 #'
 #' Sets or pulls stored GitHub credentials and initiates updates of firekit package.
 #'
@@ -10,11 +10,11 @@
 #'
 #' @examples
 #' \dontrun{
-#' fc_update(force = TRUE)
+#' firekit_update(force = TRUE)
 #' }
 
-fc_update <- function(dependencies = NA,
-                        force = FALSE) {
+firekit_update <- function(dependencies = NA,
+                           force = FALSE) {
 
   print("WARNING : If GitHub credentials aren't already in memory, check for a prompt to...:")
   print("        : 01. Log into GitHub through your browser, or,")

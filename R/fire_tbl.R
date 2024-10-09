@@ -27,6 +27,8 @@ fire_tbl <- function(query = NULL,
   if ("con" %in% ls(envir = .GlobalEnv) &
       reset) {
     DBI::dbDisconnect(con)
+    rm(list = c("con"),
+       envir = .GlobalEnv)
   }
 
   ## CHECK IF A CONNECTION OBJECT NAMED `CON` EXISTS IN THE GLOBAL ENVIRONMENT...

@@ -4,14 +4,18 @@
 \alias{fc_write}
 \title{fc_write}
 \usage{
-fc_write(x, tbl, db = "firecentre", overwrite = FALSE)
+fc_write(x, tbl, chunk_size = NULL, db = "firecentre", create = FALSE)
 }
 \arguments{
 \item{x}{Dataset to push to database.}
 
 \item{tbl}{Database schema and table name: Must be in \code{schema.table} syntax.}
 
+\item{chunk_size}{Number of rows to insert into the database at a time.}
+
 \item{db}{Database name or path/to/database/object.}
+
+\item{create}{Logical denoting whether to create a new table or overwrite an existing one.}
 }
 \value{
 Data exported to database.

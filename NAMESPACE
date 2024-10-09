@@ -2,11 +2,11 @@
 
 export(fc_index)
 export(fc_remove)
-export(fc_update)
 export(fc_write)
 export(fire_pal)
 export(fire_project)
 export(fire_tbl)
+export(firekit_update)
 export(pkgs)
 export(pprint)
 export(theme_fire)
