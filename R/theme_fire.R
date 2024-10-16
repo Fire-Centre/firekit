@@ -14,8 +14,8 @@
 #' @examples
 #' tibble::tibble(x = 1:10,
 #'                y = 10:1) |>
-#'  ggplot(aes(x = x, y = y)) +
-#'  geom_point() +
+#'  ggplot2::ggplot(ggplot2::aes(x = x, y = y)) +
+#'  ggplot2::geom_point() +
 #'  theme_fire()
 #'
 
