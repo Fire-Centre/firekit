@@ -4,12 +4,12 @@
 \alias{fire_pal}
 \title{fire_pal}
 \usage{
-fire_pal(n = 5, pal = "fire")
+fire_pal(n = 5, pal = "rfs")
 }
 \arguments{
 \item{n}{int : Number of unique color values to use.}
 
-\item{pal}{chr : Internal palette choice, including 'new', 'new2', 'classic', 'blue', 'green', 'grey', 'red', 'nature', 'nature2', 'forest', 'oak', 'ochre', and 'basalt'.}
+\item{pal}{chr : Internal palette choice, including 'bw', 'climate', 'climcyc', 'fire', 'grey', 'red', 'rfs', 'sinebow', 'utas', 'utas2'}
 }
 \value{
 Vector of color hex codes using shades of UTAS-themed colours.

@@ -80,6 +80,17 @@ fire_tbl <- function(query = NULL,
 
           if (setup_flag) {
 
+            ## TODO: Check if schema exists already.
+            ##     : A schema doesn't show up this way if it doesn't have any tables written to it. Hmm.
+            # .tables <-
+            #   DBI::dbGetQuery(.con,
+            #                   "SELECT *
+            #                 FROM pg_catalog.pg_tables
+            #                 WHERE schemaname != 'pg_catalog' AND
+            #                 schemaname != 'information_schema';") |>
+            #   dplyr::pull(schemaname) |>
+            #   unique()
+
             .setup <-
               rstudioapi::askForPassword('Would you like to set up personal schema?')
 
