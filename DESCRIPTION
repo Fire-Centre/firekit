@@ -1,29 +1,36 @@
 Package: firekit
-Title: General purpose toolkit for the Fire Centre.
+Title: General purpose toolkit for the Fire Centre
 Version: 0.0.2.2000
-Authors@R: 
+Authors@R: c(
     person(given = "Todd",
            family = "Ellis",
            role = c("aut", "cre"),
            email = "toddellis.wa@gmail.com",
-           comment = c(ORCID = "0000-0002-4410-8676"))
+           comment = c(ORCID = "0000-0002-4410-8676")),
+    person(given = "Grant",
+           family = "Williamson",
+           role = c("aut"),
+           email = "grant.williamson@utas.edu.au",
+           comment = c(ORCID = "0000-0002-3469-7550"))
+    )
 Description: &c.
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports:
-  cowplot,
-  DBI,
-  dbplyr,
-  dplyr,
-  duckdb,
-  duckplyr,
-  fs,
-  grDevices,
-  lubridate,
-  RPostgres,
-  rstudioapi,
-  tidyr,
-  tidyselect
+    cowplot,
+    DBI,
+    dbplyr,
+    dplyr,
+    duckdb,
+    duckplyr,
+    fs,
+    grDevices,
+    lubridate,
+    RPostgres,
+    rstudioapi,
+    tidyr,
+    tidyselect,
+    ggplot2,
+    utils
