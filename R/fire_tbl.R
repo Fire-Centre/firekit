@@ -17,208 +17,202 @@
 #'
 #' }
 #'
-fire_tbl <- function(query = NULL,
-                     db = "firecentre",
-                     reset = FALSE,
-                     writable = FALSE,
-                     kid = 1,
-                     ...) {
-
-  if ("con" %in% ls(envir = .GlobalEnv) &
-      reset) {
+fire_tbl <- function(
+  query = NULL,
+  db = "firecentre",
+  reset = FALSE,
+  writable = FALSE,
+  kid = 1,
+  ...
+) {
+  if ("con" %in% ls(envir = .GlobalEnv) & reset) {
     DBI::dbDisconnect(con)
-    rm(list = c("con"),
-       envir = .GlobalEnv)
+    rm(list = c("con"), envir = .GlobalEnv)
   }
 
   ## CHECK IF A CONNECTION OBJECT NAMED `CON` EXISTS IN THE GLOBAL ENVIRONMENT...
-  if ("con" %in% ls(envir = .GlobalEnv) &
-      !reset) {
+  if ("con" %in% ls(envir = .GlobalEnv) & !reset) {
+    .con <- get("con", envir = .GlobalEnv)
+  } else {
+    ## Potential to add multiple databases as options.
+    if (db %in% c("firecentre")) {
+      if (db == "firecentre") {
+        if (is.na(keyring::key_list(db)[kid, 2])) {
+          setup_flag = TRUE
+        } else {
+          setup_flag = FALSE
+        }
 
-    .con <- get("con",
-                envir = .GlobalEnv)
-
-    } else {
-
-      ## Potential to add multiple databases as options.
-      if (db %in% c("firecentre")) {
-
-        if (db == "firecentre") {
-
-          if (is.na(keyring::key_list(db)[kid,2])) {
-            setup_flag = TRUE
-          } else {
-            setup_flag = FALSE
+        .uid = tryCatch(
+          ## Check to see if username exists for the specified server name
+          ## TODO: Clean this up -- it seems overly complicated(?)...
+          ifelse(setup_flag, warning(), keyring::key_list(db)[kid, 2]),
+          warning = function(cond) {
+            .uid = rstudioapi::askForPassword('Username')
+            keyring::key_set(service = db, username = .uid)
+            return(.uid)
+          },
+          error = function(cond) {
+            .uid = rstudioapi::askForPassword('Username')
+            keyring::key_set(service = db, username = .uid)
+            return(.uid)
           }
+        )
 
-          .uid = tryCatch(
-            ## Check to see if username exists for the specified server name
-            ## TODO: Clean this up -- it seems overly complicated(?)...
-            ifelse(setup_flag,
-                   warning(),
-                   keyring::key_list(db)[kid,2]),
-            warning = function(cond) {
-              .uid = rstudioapi::askForPassword('Username')
-              keyring::key_set(service = db,
-                               username = .uid)
-              return(.uid)
-            },
-            error = function(cond) {
-              .uid = rstudioapi::askForPassword('Username')
-              keyring::key_set(service = db,
-                               username = .uid)
-              return(.uid)
-            }
+        .con <-
+          DBI::dbConnect(
+            RPostgres::Postgres(),
+            dbname = db,
+            host = "131.217.175.166",
+            user = .uid,
+            password = keyring::key_get(db, .uid)
           )
 
-          .con <-
-            DBI::dbConnect(RPostgres::Postgres(),
-                           dbname = db,
-                           host = "131.217.175.166",
-                           user = .uid,
-                           password = keyring::key_get(db, .uid))
+        if (setup_flag) {
+          ## TODO: Check if schema exists already.
+          ##     : A schema doesn't show up this way if it doesn't have any tables written to it. Hmm.
+          # .tables <-
+          #   DBI::dbGetQuery(.con,
+          #                   "SELECT *
+          #                 FROM pg_catalog.pg_tables
+          #                 WHERE schemaname != 'pg_catalog' AND
+          #                 schemaname != 'information_schema';") |>
+          #   dplyr::pull(schemaname) |>
+          #   unique()
 
-          if (setup_flag) {
+          .setup <-
+            rstudioapi::askForPassword(
+              'Would you like to set up personal schema?'
+            )
 
-            ## TODO: Check if schema exists already.
-            ##     : A schema doesn't show up this way if it doesn't have any tables written to it. Hmm.
-            # .tables <-
-            #   DBI::dbGetQuery(.con,
-            #                   "SELECT *
-            #                 FROM pg_catalog.pg_tables
-            #                 WHERE schemaname != 'pg_catalog' AND
-            #                 schemaname != 'information_schema';") |>
-            #   dplyr::pull(schemaname) |>
-            #   unique()
-
+          while (!.setup %in% c('y', 'n', 'yes', 'no')) {
             .setup <-
-              rstudioapi::askForPassword('Would you like to set up personal schema?')
-
-            while (!.setup %in% c('y', 'n', 'yes', 'no')) {
-
-              .setup <-
-                rstudioapi::askForPassword("Would you like to set up personal schema? Please specify 'y', 'yes', 'n', 'no'.")
-
-            }
-
-            if (.setup %in% c('y', 'yes')) {
-
-              DBI::dbGetQuery(.con,
-                              glue::glue("CREATE SCHEMA AUTHORIZATION {.uid};"))
-              DBI::dbGetQuery(.con,
-                              glue::glue("ALTER USER '{.uid}' SET SEARCH_PATH = '{.uid}';"))
-              DBI::dbGetQuery(.con,
-                              glue::glue("SET SEARCH_PATH TO {.uid};"))
-
-            }
-
+              rstudioapi::askForPassword(
+                "Would you like to set up personal schema? Please specify 'y', 'yes', 'n', 'no'."
+              )
           }
 
-        } else {
-
-          stop("Please provide a pre-set database connection (currently only: `firecentre`) or the direct path to a database object.")
-
+          if (.setup %in% c('y', 'yes')) {
+            DBI::dbGetQuery(
+              .con,
+              glue::glue("CREATE SCHEMA AUTHORIZATION {.uid};")
+            )
+            DBI::dbGetQuery(
+              .con,
+              glue::glue("ALTER USER '{.uid}' SET SEARCH_PATH = '{.uid}';")
+            )
+            DBI::dbGetQuery(.con, glue::glue("SET SEARCH_PATH TO {.uid};"))
+          }
         }
-
       } else {
-
-        ## TODO: Need to allow for multiple database types here. Perhaps using `odbc()`?
-        if (stringr::str_detect(db, ".duckdb")) {
-
-          .con <-
-            db |>
-            duckdb::duckdb(read_only = !writable) |>
-            DBI::dbConnect()
-
-        } else {
-
-          stop("Currently only custom {duckdb} databases are supported. Contact todd.ellis@utas.edu.au to addres.")
-
-        }
-
+        stop(
+          "Please provide a pre-set database connection (currently only: `firecentre`) or the direct path to a database object."
+        )
       }
-
-      con <<-
-        .con
-
+    } else {
+      ## TODO: Need to allow for multiple database types here. Perhaps using `odbc()`?
+      if (stringr::str_detect(db, ".duckdb")) {
+        .con <-
+          db |>
+          duckdb::duckdb(read_only = !writable) |>
+          DBI::dbConnect()
+      } else {
+        stop(
+          "Currently only custom {duckdb} databases are supported. Contact todd.ellis@utas.edu.au to addres."
+        )
+      }
     }
 
-    query_flag <-
-      FALSE
+    con <<-
+      .con
+  }
 
-    #### STOP IF NO TABLE IS SELECTED
-    if (is.null(query)) {
-      stop('ERROR             : Please choose a SCHEMA.TABLENAME or provide a valid SQL query.')
-    } else {
+  query_flag <-
+    FALSE
 
-      ## CHECK IF REQUESTED TABLE IS A SQL QUERY AND RUN IT!
-      if (stringr::str_starts(tolower(stringr::str_trim(query)), "(alter|create|drop|select|set|update|show|with) ")) {
+  #### STOP IF NO TABLE IS SELECTED
+  if (is.null(query)) {
+    stop(
+      'ERROR             : Please choose a SCHEMA.TABLENAME or provide a valid SQL query.'
+    )
+  } else {
+    ## CHECK IF REQUESTED TABLE IS A SQL QUERY AND RUN IT!
+    if (
+      stringr::str_starts(
+        tolower(stringr::str_trim(query)),
+        "(alter|create|drop|select|set|update|show|with) "
+      )
+    ) {
+      .query_flag <- TRUE
 
-        .query_flag <- TRUE
-
-        ## Check for unique PostgreSQL syntax for SHOW ALL TABLES;
-        ## N.B. This is a hack-y workaround!
-        if (startsWith(tolower(stringr::str_trim(query)), "show all tables") &
-            class(.con)[1] == "PqConnection") {
-
-          .output <-
-            DBI::dbGetQuery(.con,
-                            "SELECT *
+      ## Check for unique PostgreSQL syntax for SHOW ALL TABLES;
+      ## N.B. This is a hack-y workaround!
+      if (
+        startsWith(tolower(stringr::str_trim(query)), "show all tables") &
+          class(.con)[1] == "PqConnection"
+      ) {
+        .output <-
+          DBI::dbGetQuery(
+            .con,
+            "SELECT *
                             FROM pg_catalog.pg_tables
                             WHERE schemaname != 'pg_catalog' AND
-                            schemaname != 'information_schema';")
-
-
-        } else {
-
-          .output <- tryCatch({
-            DBI::dbGetQuery(.con,
-                            query)
+                            schemaname != 'information_schema';"
+          ) |>
+          dplyr::arrange(schemaname, tablename)
+      } else {
+        .output <- tryCatch(
+          {
+            DBI::dbGetQuery(.con, query)
           },
           warning = function(cond) {
-            DBI::dbGetQuery(.con,
-                            query |>
-                              readr::read_lines() |>
-                              paste(collapse = "\n"))
+            DBI::dbGetQuery(
+              .con,
+              query |>
+                readr::read_lines() |>
+                paste(collapse = "\n")
+            )
           },
           error = function(cond) {
-            DBI::dbGetQuery(.con,
-                            query |>
-                              readr::read_lines() |>
-                              paste(collapse = "\n"))
-          })
-
-        }
-
-        if (startsWith(tolower(stringr::str_trim(query)), "show ")) {
-          .output <-
-            tibble::as_tibble(.output)
-        }
-
-      } else {
-
-        ## Upper- or lower-case table information.
-        if (class(.con) == "PqConnection") {
-          .query <-
-            tolower(query)
-        } else {
-          .query <-
-            toupper(query)
-        }
-
-          tryCatch({
-            .output <- dplyr::tbl(.con,
-                                  I(.query))
-          },
-          warning = function(cond) {},
-          error = function(cond) {
-            stop(paste0("ERROR             : Denied access to `", .query, "`. Check spelling or contact an administrator for access."))
-          })
-
+            DBI::dbGetQuery(
+              .con,
+              query |>
+                readr::read_lines() |>
+                paste(collapse = "\n")
+            )
+          }
+        )
       }
 
+      if (startsWith(tolower(stringr::str_trim(query)), "show ")) {
+        .output <-
+          tibble::as_tibble(.output)
+      }
+    } else {
+      ## Upper- or lower-case table information.
+      if (class(.con) == "PqConnection") {
+        .query <-
+          tolower(query)
+      } else {
+        .query <-
+          toupper(query)
+      }
+
+      tryCatch(
+        {
+          .output <- dplyr::tbl(.con, I(.query))
+        },
+        warning = function(cond) {},
+        error = function(cond) {
+          stop(paste0(
+            "ERROR             : Denied access to `",
+            .query,
+            "`. Check spelling or contact an administrator for access."
+          ))
+        }
+      )
     }
-
-    return(.output)
-
   }
+
+  return(.output)
+}

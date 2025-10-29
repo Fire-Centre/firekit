@@ -13,11 +13,11 @@
 #' @examples
 #' \dontrun{
 #'   threshold_curve(mtcars, mpg, cyl, n_range = 25, dir = ">", extend = 0.1, rescale = F) |>
-#'     threshold_nls(mpg, cyl, plot = TRUE)
+#'     threshold_nls(mpg, cyl, dir = ">", plot = TRUE)
 #' }
 #'
 
-threshold_nls <- function(df, x, y, plot = FALSE) {
+threshold_nls <- function(df, x, y, dir = ">", plot = FALSE) {
   # If the data frame is grouped, nest it, run the model on each group, and unnest.
   if (dplyr::is_grouped_df(df)) {
     return(
@@ -39,6 +39,7 @@ threshold_nls <- function(df, x, y, plot = FALSE) {
     )
   }
   .df <- df
+  .dir <- dir
   .x_colname <- rlang::as_name(rlang::enquo(x))
   .y_colname <- rlang::as_name(rlang::enquo(y))
 
@@ -83,38 +84,115 @@ threshold_nls <- function(df, x, y, plot = FALSE) {
     }
   )
 
-  if (plot) {
-    .ymin = min(dplyr::pull(.df, {{ y }}), na.rm = TRUE)
-    .ymax = max(dplyr::pull(.df, {{ y }}), na.rm = TRUE)
+  .ymin = min(dplyr::pull(.df, {{ y }}), na.rm = TRUE)
+  .ymax = max(dplyr::pull(.df, {{ y }}), na.rm = TRUE)
+  .threshold <- dplyr::filter(.out, term == "xmid") |>
+    dplyr::pull(estimate)
 
+  ## TODO: WARNING here, the percentile associated with the NLS threshold is simply the *nearest* value in the actual data above the threshold. See, for example, the percentile column does not 1:1 associate with the {{ y }} column, but is impacted by the actual data distributions.
+  .x_int <- dplyr::arrange(.df, {{ x }}) |>
+    dplyr::filter({{ x }} >= .threshold) |>
+    dplyr::slice(1) |>
+    dplyr::mutate(
+      {{ x }} := .threshold,
+      percentile = {{ y }} / .ymax,
+      threshold_desc = "Non-linear least squares"
+    ) |>
+    dplyr::bind_rows(
+      dplyr::filter(.df, {{ y }} >= (0.05 * .ymax)) |>
+        dplyr::arrange(
+          if (.dir == ">") {
+            dplyr::desc({{ x }})
+          } else {{ x }}
+        ) |>
+        dplyr::slice(1) |>
+        dplyr::mutate(percentile = 0.05) |>
+        dplyr::bind_rows(
+          dplyr::filter(.df, {{ y }} >= (0.1 * .ymax)) |>
+            dplyr::arrange(
+              if (.dir == ">") {
+                dplyr::desc({{ x }})
+              } else {{ x }}
+            ) |>
+            dplyr::slice(1) |>
+            dplyr::mutate(percentile = 0.1)
+        ) |>
+        dplyr::bind_rows(
+          dplyr::filter(.df, {{ y }} >= (0.25 * .ymax)) |>
+            dplyr::arrange(
+              if (.dir == ">") {
+                dplyr::desc({{ x }})
+              } else {{ x }}
+            ) |>
+            dplyr::slice(1) |>
+            dplyr::mutate(percentile = 0.25)
+        ) |>
+        dplyr::bind_rows(
+          dplyr::filter(.df, {{ y }} >= (0.5 * .ymax)) |>
+            dplyr::arrange(
+              if (.dir == ">") {
+                dplyr::desc({{ x }})
+              } else {{ x }}
+            ) |>
+            dplyr::slice(1) |>
+            dplyr::mutate(percentile = 0.5)
+        ) |>
+        dplyr::bind_rows(
+          dplyr::filter(.df, {{ y }} >= (0.75 * .ymax)) |>
+            dplyr::arrange(
+              if (.dir == ">") {
+                dplyr::desc({{ x }})
+              } else {{ x }}
+            ) |>
+            dplyr::slice(1) |>
+            dplyr::mutate(percentile = 0.75)
+        ) |>
+        dplyr::bind_rows(
+          dplyr::filter(.df, {{ y }} >= (0.9 * .ymax)) |>
+            dplyr::arrange(
+              if (.dir == ">") {
+                dplyr::desc({{ x }})
+              } else {{ x }}
+            ) |>
+            dplyr::slice(1) |>
+            dplyr::mutate(percentile = 0.9)
+        ) |>
+        dplyr::bind_rows(
+          dplyr::filter(.df, {{ y }} >= (0.95 * .ymax)) |>
+            dplyr::arrange(
+              if (.dir == ">") {
+                dplyr::desc({{ x }})
+              } else {{ x }}
+            ) |>
+            dplyr::slice(1) |>
+            dplyr::mutate(percentile = 0.95)
+        ) |>
+        dplyr::bind_rows(
+          dplyr::filter(.df, {{ y }} >= (0.99 * .ymax)) |>
+            dplyr::arrange(
+              if (.dir == ">") {
+                dplyr::desc({{ x }})
+              } else {{ x }}
+            ) |>
+            dplyr::slice(1) |>
+            dplyr::mutate(percentile = 0.99)
+        ) |>
+        dplyr::mutate(threshold_desc = "Percentile")
+    )
+
+  if (plot) {
     p <-
       ggplot2::ggplot(
         data = .df,
         mapping = ggplot2::aes(x = {{ x }}, y = {{ y }})
       )
 
-    .threshold <- dplyr::filter(.out, term == "xmid") |>
-      dplyr::pull(estimate)
-
-    .x_int <- dplyr::filter(.df, {{ y }} >= (0.1 * .ymax)) |>
-      dplyr::arrange({{ y }}) |>
-      dplyr::slice(1) |>
-      dplyr::bind_rows(
-        dplyr::filter(.df, {{ y }} >= (0.25 * .ymax)) |>
-          dplyr::arrange({{ y }}) |>
-          dplyr::slice(1)
-      ) |>
-      dplyr::bind_rows(
-        dplyr::filter(.df, {{ y }} >= (0.5 * .ymax)) |>
-          dplyr::arrange({{ y }}) |>
-          dplyr::slice(1)
-      )
-
     # Add the vertical lines if there are any valid intercept values
     if (nrow(.x_int) > 0 && !all(is.na(.x_int))) {
+      `%>%` <- magrittr::`%>%`
       p <- p +
         ggplot2::geom_linerange(
-          data = .x_int,
+          data = dplyr::filter(.x_int, threshold_desc == "Percentile"),
           mapping = ggplot2::aes(ymax = {{ y }}),
           ymin = .ymin,
           linewidth = 0.7,
@@ -140,8 +218,11 @@ threshold_nls <- function(df, x, y, plot = FALSE) {
       # ggplot2::geom_smooth(method = "glm", method.args = list(family = "binomial"), se = FALSE, col = "grey40") +
       ggplot2::theme_classic()
 
-    print(p)
+    # Instead of just printing, return the plot object along with the results
+    return(list(nls = .out, thresholds = .x_int, plot = p))
   }
 
-  return(.out)
+  # If not plotting, return results directly or in a list for consistency
+  # Returning a list is better for the recursive grouped call
+  return(list(nls = .out, thresholds = .x_int, plot = NULL))
 }

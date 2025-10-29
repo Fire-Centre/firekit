@@ -20,13 +20,13 @@
 #'
 
 threshold_curve <- function(
-    df,
-    x,
-    y,
-    n_range = 100,
-    dir = c(">", "<"),
-    extend = NULL,
-    rescale = FALSE
+  df,
+  x,
+  y,
+  n_range = 100,
+  dir = c(">", "<"),
+  extend = NULL,
+  rescale = FALSE
 ) {
   # If the data frame is grouped, nest it, run the model on each group, and unnest.
   if (dplyr::is_grouped_df(df)) {
