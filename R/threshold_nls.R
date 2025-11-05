@@ -168,6 +168,16 @@ threshold_nls <- function(df, x, y, dir = ">", plot = FALSE) {
             dplyr::mutate(percentile = 0.95)
         ) |>
         dplyr::bind_rows(
+          dplyr::filter(.df, {{ y }} >= (0.975 * .ymax)) |>
+            dplyr::arrange(
+              if (.dir == ">") {
+                dplyr::desc({{ x }})
+              } else {{ x }}
+            ) |>
+            dplyr::slice(1) |>
+            dplyr::mutate(percentile = 0.975)
+        ) |>
+        dplyr::bind_rows(
           dplyr::filter(.df, {{ y }} >= (0.99 * .ymax)) |>
             dplyr::arrange(
               if (.dir == ">") {
@@ -177,7 +187,12 @@ threshold_nls <- function(df, x, y, dir = ">", plot = FALSE) {
             dplyr::slice(1) |>
             dplyr::mutate(percentile = 0.99)
         ) |>
-        dplyr::mutate(threshold_desc = "Percentile")
+        dplyr::mutate(
+          threshold_desc = scales::percent(
+            percentile,
+            accuracy = ifelse(percentile == 0.975, 0.1, 1)
+          )
+        )
     )
 
   if (plot) {
@@ -224,5 +239,5 @@ threshold_nls <- function(df, x, y, dir = ">", plot = FALSE) {
 
   # If not plotting, return results directly or in a list for consistency
   # Returning a list is better for the recursive grouped call
-  return(list(nls = .out, thresholds = .x_int, plot = NULL))
+  return(list(nls = .out, thresholds = .x_int))
 }
