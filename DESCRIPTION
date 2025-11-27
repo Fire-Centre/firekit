@@ -1,6 +1,6 @@
 Package: firekit
 Title: General purpose toolkit for the Fire Centre
-Version: 0.0.2.500
+Version: 0.0.2.600
 Authors@R: c(
     person(given = "Todd",
            family = "Ellis",
@@ -33,4 +33,10 @@ Imports:
     tidyr,
     tidyselect,
     ggplot2,
-    utils
+    utils,
+    sf,
+    terra,
+    purrr,
+    stats,
+    raster,
+    tibble
