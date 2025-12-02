@@ -39,4 +39,6 @@ Imports:
     purrr,
     stats,
     raster,
-    tibble
+    tibble,
+    mgcv,
+    qgam
