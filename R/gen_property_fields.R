@@ -1,7 +1,7 @@
 #' Precalculate landscape fields reqired for landscape risk calculations
 #'
 #' @param locations sf point object containing an ID field
-#' @param dem Raster object with digtial elevation model of region
+#' @param dem Terra rast object with digtial elevation model of region
 #' @param veg Vegetation polygon layer with vegetation type in VEG_GROUP field
 #' @param urb_types List of vegetation types to treat as urban/no fire risk
 #' @param urb_set Vegetation type string to associate with urban in output
@@ -17,9 +17,9 @@
 generate_property_fields <- function(locations,
                                      dem,
                                      veg,
-                                     urb_types=c("Other natural environments", "Agricultural, urban and exotic vegetation"),
+                                     urb_types=c("Other natural environments", "Agricultural, urban and exotic vegetation", "Modified land"),
                                      urb_set="Agricultural, urban and exotic vegetation",
-                                     id_field="RespondentID"){
+                                     id_field="RespondentID",fr_angle=315){
   VEG_GROUP<-""
   angle <- ""
   vlen <- ""
@@ -33,8 +33,8 @@ generate_property_fields <- function(locations,
     p1 <- sf::st_sf(p1,dplyr::tibble(angle=seq(0,355,45)))
 
     # Extract elevation along each vector
-    e <- raster::extract(dem,p1,along=TRUE,small=TRUE)
-
+    e <- terra::extract(dem,p1,method="bilinear",along=TRUE,small=TRUE)
+    e <- split(e[,2], e[,1])
     # Calculate slope and r-squared along each vector
     slp_list <- purrr::map_df(e,sslp)
     slp_list$angle <- seq(0,355,45)
@@ -110,7 +110,7 @@ generate_property_fields <- function(locations,
 
       # Draw north-west vector
       nw_vec = nw_vector(this_adr)
-      nw_vec <- sf::st_sf(nw_vec,dplyr::tibble(angle=315))
+      nw_vec <- sf::st_sf(nw_vec,dplyr::tibble(angle=fr_angle))
       veg_nw <- sf::st_intersection(nw_vec,veg)
       veg_nw <- dplyr::filter(veg_nw,!VEG_GROUP %in% urb_types)
       if(nrow(veg_nw)==0){
