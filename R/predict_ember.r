@@ -19,5 +19,5 @@ predict_ember <- function(FDI,slope,fuel){
   require(qgam)
   slope <- factor(slope,levels=c("Flat","Hilly"))
   pf <- data.frame(FDI = FDI,Slope = slope,surface_FL = fuel)
-  exp(predict(mod,newdata=pf)[[1]])
+  exp(predict(ember_gam,newdata=pf)[[1]])
 }
