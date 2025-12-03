@@ -16,10 +16,10 @@
 #' @examples
 #' \dontrun{
 #'
-#' FBW_calc("class1","DOB","downslope",5,340,fuel_data)
+#' FBW_calc_FFDI("class1","DOB","downslope",5,340,fuel_data)
 #' }
 
-FBW_calc <- function (fb_class, vegetation_community, slope_type, effective_slope,
+FBW_calc_FFDI <- function (fb_class, vegetation_community, slope_type, effective_slope,
                       max_fire_run_distance, datdf, id, dist,var_FFDI)
 {
   vegetation_category = ""

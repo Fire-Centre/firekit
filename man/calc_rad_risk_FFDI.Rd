@@ -2,7 +2,7 @@
 % Please edit documentation in R/calc_rad_risk_FFDI.R
 \name{calc_rad_risk_FFDI}
 \alias{calc_rad_risk_FFDI}
-\title{Calculate radiant-heat risk index for properties}
+\title{Calculate radiant-heat risk index for properties for defined FFDI}
 \usage{
 calc_rad_risk_FFDI(prop_table, fuels, FFDI)
 }
@@ -17,10 +17,10 @@ calc_rad_risk_FFDI(prop_table, fuels, FFDI)
 tibble data frame with fields for fuel break width (FBW), fireline intensity (FL) and distance risk index (DRisk)
 }
 \description{
-Calculate radiant-heat risk index for properties
+Calculate radiant-heat risk index for properties for defined FFDI
 }
 \examples{
 \dontrun{
-output <- prop_table(data_points,fuel, 25)
+output <- calc_rad_risk_FFDI(houses,fuel,50)
 }
 }
