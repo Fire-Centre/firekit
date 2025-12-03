@@ -9,15 +9,16 @@ generate_property_fields(
   dem,
   veg,
   urb_types = c("Other natural environments",
-    "Agricultural, urban and exotic vegetation"),
+    "Agricultural, urban and exotic vegetation", "Modified land"),
   urb_set = "Agricultural, urban and exotic vegetation",
-  id_field = "RespondentID"
+  id_field = "RespondentID",
+  fr_angle = 315
 )
 }
 \arguments{
 \item{locations}{sf point object containing an ID field}
 
-\item{dem}{Raster object with digtial elevation model of region}
+\item{dem}{Terra rast object with digtial elevation model of region}
 
 \item{veg}{Vegetation polygon layer with vegetation type in VEG_GROUP field}
 
