@@ -11,7 +11,17 @@ Authors@R: c(
            family = "Williamson",
            role = c("aut"),
            email = "grant.williamson@utas.edu.au",
-           comment = c(ORCID = "0000-0002-3469-7550"))
+           comment = c(ORCID = "0000-0002-3469-7550")),
+    person(given = "Amila",
+           family = "Wickramasinghe",
+           role = c("aut"),
+           email = "amila.wickramasinghe@utas.edu.au",
+           comment = c(ORCID = "0000-0002-0481-9166")),
+    person(given = "Stefania",
+           family = "Ondei",
+           role = c("aut"),
+           email = "stefania.ondei@utas.edu.au",
+           comment = c(ORCID = "0000-0002-2515-3316"))
     )
 Description: &c.
 License: MIT + file LICENSE
