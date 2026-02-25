@@ -1,6 +1,6 @@
 # firekit
 
-![University of Tasmania Fire Centre](fc_logo.png)
+![University of Tasmania Fire Centre](reference/figures/fc_logo.png)
 
 University of Tasmania Fire Centre
 

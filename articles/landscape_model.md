@@ -8,7 +8,7 @@ This guide will explain how to use the radiant heat and firebrand
 (ember) impact models within the *firekit* R package developed by the
 UTAS Fire Centre. This process allows you to attribute houses with
 indices of risk of radiant heat impact (based on a threshold of 12.5
-kwm2) and ember impact (based on 95%ile distance), given suitable input
+kwm^2) and ember impact (based on 95%ile distance), given suitable input
 spatial data layers and forest fuel load definitions.
 
 The first step is to install the *firekit* package in R. This package
@@ -34,8 +34,10 @@ and *sf* packages for spatial data.
     library(sf)
 
 Next we can load the data files required for this analysis. This are
-available in a ZIP file, which you can unzip into the **data** folder of
-your project directory.
+available in a ZIP file (data.zip) which is available in the root
+directory of the firekit package and on
+[Github](https://github.com/Fire-Centre/firekit/blob/main/data.zip),
+which you can unzip into the **data** folder of your project directory.
 
 First, a digital elevation model of the area surrounding our example
 properties.

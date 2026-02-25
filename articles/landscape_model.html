@@ -69,7 +69,7 @@
 (ember) impact models within the <em>firekit</em> R package developed by
 the UTAS Fire Centre. This process allows you to attribute houses with
 indices of risk of radiant heat impact (based on a threshold of 12.5
-kwm2) and ember impact (based on 95%ile distance), given suitable input
+kwm^2) and ember impact (based on 95%ile distance), given suitable input
 spatial data layers and forest fuel load definitions.</p>
 <p>The first step is to install the <em>firekit</em> package in R. This
 package has not yet been submitted to the CRAN archive, but it is
@@ -88,8 +88,10 @@ and the <em>terra</em> and <em>sf</em> packages for spatial data.</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/" class="external-link">terra</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span></code></pre>
 <p>Next we can load the data files required for this analysis. This are
-available in a ZIP file, which you can unzip into the
-<strong>data</strong> folder of your project directory.</p>
+available in a ZIP file (data.zip) which is available in the root
+directory of the firekit package and on <a href="https://github.com/Fire-Centre/firekit/blob/main/data.zip" class="external-link">Github</a>,
+which you can unzip into the <strong>data</strong> folder of your
+project directory.</p>
 <p>First, a digital elevation model of the area surrounding our example
 properties.</p>
 <pre><code><span><span class="va">dem</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="st">"data/dem.tif"</span><span class="op">)</span></span></code></pre>
