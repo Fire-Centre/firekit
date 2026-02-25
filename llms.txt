@@ -1,0 +1,131 @@
+# firekit
+
+![University of Tasmania Fire Centre](fc_logo.png)
+
+University of Tasmania Fire Centre
+
+An R package containing a variety of functions developed by the
+[University of Tasmania Fire Centre](https://firecentre.org.au/). This
+includes functions for calculating a range of fire weather indices,
+calculating spatial landscape metrics over fire regime rasters, and a
+spatial model of urban-rural fire risk incorporating radiant heat and
+ember transport.
+
+Package development was support by [Natural Hazards Research
+Australia](https://www.naturalhazards.com.au) project [Bushfire Risk a
+the Urban-Rural
+Interface](https://www.naturalhazards.com.au/research/research-projects/bushfire-risk-rural-urban-interface).
+
+# Package index
+
+## All functions
+
+- [`FBW_calc()`](https://fire-centre.github.io/firekit/reference/FBW_calc.md)
+  : Fuel Break Width Calculator
+- [`FBW_calc_FFDI()`](https://fire-centre.github.io/firekit/reference/FBW_calc_FFDI.md)
+  : Fuel Break Width Calculator With Variable FFDI
+- [`RAD_calc()`](https://fire-centre.github.io/firekit/reference/RAD_calc.md)
+  : Radiant Heat Calculator
+- [`RS_to_MFI()`](https://fire-centre.github.io/firekit/reference/RS_to_MFI.md)
+  : Convert Rate of Spread to Moorland FDI
+- [`calc_MFDI()`](https://fire-centre.github.io/firekit/reference/calc_MFDI.md)
+  : Calculate Moorland Fire Danger Index
+- [`calc_SDI()`](https://fire-centre.github.io/firekit/reference/calc_SDI.md)
+  : Calculate Mount's Soil Dryness Index (SDI)
+- [`calc_ember_risk()`](https://fire-centre.github.io/firekit/reference/calc_ember_risk.md)
+  : Calculate ember risk
+- [`calc_lsm()`](https://fire-centre.github.io/firekit/reference/calc_lsm.md)
+  : calc_lsm
+- [`calc_rad_risk()`](https://fire-centre.github.io/firekit/reference/calc_rad_risk.md)
+  : Calculate radiant-heat risk index for properties
+- [`calc_rad_risk_FFDI()`](https://fire-centre.github.io/firekit/reference/calc_rad_risk_FFDI.md)
+  : Calculate radiant-heat risk index for properties for defined FFDI
+- [`calc_view_factor()`](https://fire-centre.github.io/firekit/reference/calc_view_factor.md)
+  : Calculate View Factor
+- [`classify_tsf()`](https://fire-centre.github.io/firekit/reference/classify_tsf.md)
+  : classify_tsf
+- [`compass_vectors()`](https://fire-centre.github.io/firekit/reference/compass_vectors.md)
+  : Construct 8 line vectors in cardinal directions from a point over a
+  distance
+- [`dayintegral()`](https://fire-centre.github.io/firekit/reference/dayintegral.md)
+  : Calculate number of hours of sunlight for a given day
+- [`daylengths()`](https://fire-centre.github.io/firekit/reference/daylengths.md)
+  : Calculate a vector of day lengths for a given latitude, by julian
+  day
+- [`determineMaxViewFactor()`](https://fire-centre.github.io/firekit/reference/determineMaxViewFactor.md)
+  : Determine Maximum View Factor
+- [`fc_index()`](https://fire-centre.github.io/firekit/reference/fc_index.md)
+  : fc_index
+- [`fc_remove()`](https://fire-centre.github.io/firekit/reference/fc_remove.md)
+  : fc_remove
+- [`fc_write()`](https://fire-centre.github.io/firekit/reference/fc_write.md)
+  : fc_write
+- [`ffdi()`](https://fire-centre.github.io/firekit/reference/ffdi.md) :
+  Calculator for single Forest Fire Danger Index calculation
+- [`fhi_curve()`](https://fire-centre.github.io/firekit/reference/fhi_curve.md)
+  : fhi_curve
+- [`fhi_nls()`](https://fire-centre.github.io/firekit/reference/fhi_nls.md)
+  : fhi_nls
+- [`fire_pal()`](https://fire-centre.github.io/firekit/reference/fire_pal.md)
+  : fire_pal
+- [`fire_project()`](https://fire-centre.github.io/firekit/reference/fire_project.md)
+  : fire_project
+- [`fire_tbl()`](https://fire-centre.github.io/firekit/reference/fire_tbl.md)
+  : fire_tbl
+- [`firekit_update()`](https://fire-centre.github.io/firekit/reference/firekit_update.md)
+  : firekit_update
+- [`forest_behav()`](https://fire-centre.github.io/firekit/reference/forest_behav.md)
+  : Forest fire behaviour parameters from FFDI and Fuel Load
+- [`generate_max_run()`](https://fire-centre.github.io/firekit/reference/generate_max_run.md)
+  : Precalculate max fire run distance
+- [`generate_property_fields()`](https://fire-centre.github.io/firekit/reference/generate_property_fields.md)
+  : Precalculate landscape fields reqired for landscape risk
+  calculations
+- [`get_ET()`](https://fire-centre.github.io/firekit/reference/get_ET.md)
+  : Get Evapotranspiration value for given Temperature and Soil Dryness
+  Index
+- [`get_moor_FM()`](https://fire-centre.github.io/firekit/reference/get_moor_FM.md)
+  : Calculates Moorland FDI Fuel Moisture
+- [`get_moor_HF()`](https://fire-centre.github.io/firekit/reference/get_moor_HF.md)
+  : Calculate moorland FDI humidity factor
+- [`get_moor_RF()`](https://fire-centre.github.io/firekit/reference/get_moor_RF.md)
+  : Calculate Moorland FDI Rainfall Factor
+- [`get_moor_RS()`](https://fire-centre.github.io/firekit/reference/get_moor_RS.md)
+  : Calculate Moorland FDI rate of spread
+- [`hourwatt()`](https://fire-centre.github.io/firekit/reference/hourwatt.md)
+  : Calculate radiation in W/m2 for a given latitude, hour of day and
+  day of year
+- [`line_vector()`](https://fire-centre.github.io/firekit/reference/line_vector.md)
+  : Construct line vector from a point over a given distance
+- [`nw_vector()`](https://fire-centre.github.io/firekit/reference/nw_vector.md)
+  : Generate sf vector line in a given direction from point, default
+  north-west
+- [`pkgs()`](https://fire-centre.github.io/firekit/reference/pkgs.md) :
+  pkgs
+- [`pprint()`](https://fire-centre.github.io/firekit/reference/pprint.md)
+  : pprint
+- [`predict_ember()`](https://fire-centre.github.io/firekit/reference/predict_ember.md)
+  : Calculate 95th percentile ember distance from FDI, slope and fuel
+  load
+- [`shift_poly()`](https://fire-centre.github.io/firekit/reference/shift_poly.md)
+  : Extend and shift a polygon by a given angle and distance
+- [`slope_vector()`](https://fire-centre.github.io/firekit/reference/slope_vector.md)
+  : Calculate slope based on regression over a given distance and angle
+  across a DEM
+- [`sslp()`](https://fire-centre.github.io/firekit/reference/sslp.md) :
+  Regress slope from vector of elevations
+- [`sunaltitude()`](https://fire-centre.github.io/firekit/reference/sunaltitude.md)
+  : Calculate sun altitude for given latitude, day and time
+- [`theme_fire()`](https://fire-centre.github.io/firekit/reference/theme_fire.md)
+  : theme_fire
+- [`threshold_curve()`](https://fire-centre.github.io/firekit/reference/threshold_curve.md)
+  : threshold_curve
+- [`threshold_nls()`](https://fire-centre.github.io/firekit/reference/threshold_nls.md)
+  : threshold_nls
+
+# Articles
+
+### All vignettes
+
+- [Landscape Fire Hazard Model -
+  Firekit](https://fire-centre.github.io/firekit/articles/landscape_model.md):
