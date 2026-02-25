@@ -52,3 +52,5 @@ Imports:
     tibble,
     mgcv,
     qgam
+URL: https://fire-centre.github.io/firekit/
+Config/Needs/website: rmarkdown
