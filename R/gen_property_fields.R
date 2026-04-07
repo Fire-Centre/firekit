@@ -25,6 +25,7 @@ generate_property_fields <- function(locations,
   vlen <- ""
   proc_idx <- function(main_idx){
     this_adr <- locations[main_idx,]
+    this_adr$VEG_GROUP[this_adr$VEG_GROUP %in% urb_types]=urb_set
     #print(main_idx)
     # Generate compass vectors at 45-degree increments around point
     p1 <- compass_vectors(this_adr,150)
@@ -43,13 +44,13 @@ generate_property_fields <- function(locations,
     veg_e <- sf::st_intersection(p1,veg)
 
     # Remove any non-veg categories
-    no_urb <- dplyr::filter(veg_e,!VEG_GROUP %in% urb_types)
+    no_urb <- dplyr::filter(veg_e,!VEG_GROUP %in% urb_set)
 
 
     if(nrow(no_urb)==0){
       # If it's all urban, then just call this an urban site
       type<-"Urban"
-      all_dir=dplyr::tibble(VEG_GROUP="Agricultural, urban and exotic vegetation",
+      all_dir=dplyr::tibble(VEG_GROUP=urb_set,
                             angle=0,dist=150,slope=0,slope_type="flat",type=type,maxrun="< 300m")
 
 
@@ -112,7 +113,7 @@ generate_property_fields <- function(locations,
       nw_vec = nw_vector(this_adr)
       nw_vec <- sf::st_sf(nw_vec,dplyr::tibble(angle=fr_angle))
       veg_nw <- sf::st_intersection(nw_vec,veg)
-      veg_nw <- dplyr::filter(veg_nw,!VEG_GROUP %in% urb_types)
+      veg_nw <- dplyr::filter(veg_nw,!VEG_GROUP %in% urb_set)
       if(nrow(veg_nw)==0){
         all_dir$maxrun="< 300m"
       }else{
