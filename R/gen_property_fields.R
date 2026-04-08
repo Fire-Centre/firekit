@@ -23,9 +23,10 @@ generate_property_fields <- function(locations,
   VEG_GROUP<-""
   angle <- ""
   vlen <- ""
+  veg$VEG_GROUP[veg$VEG_GROUP %in% urb_types]=urb_set
   proc_idx <- function(main_idx){
     this_adr <- locations[main_idx,]
-    this_adr$VEG_GROUP[this_adr$VEG_GROUP %in% urb_types]=urb_set
+
     #print(main_idx)
     # Generate compass vectors at 45-degree increments around point
     p1 <- compass_vectors(this_adr,150)
